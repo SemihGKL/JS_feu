@@ -40,7 +40,7 @@ function isNotNumber(args){
     let counter = 0
     for (let i = 0; i < args.length; i++) {
         if (args[i].match(nbRegex)) {
-            res = true
+
         } else {
             counter ++
         }        
