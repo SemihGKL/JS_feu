@@ -21,7 +21,7 @@ const arg1 = process.argv[2]
 const arg2 = process.argv[3]
 const arg3 = process.argv[4]
 const nbRegex = /^-?[0-9]\d*(\.\d+)?$/ //Expression permettant de trouver un nombre décimal
-const signePrioRgx = /[\*\/\%]+/ //expression permettant de reconnaitre un signe opérateur prioritaire (* / et %)
+const signePrioRgx = /\*|\/|\%/ //expression permettant de reconnaitre un signe opérateur prioritaire (* / et %)
 const signeBasicRgx = /\+|\-/ //expression permettant de reconnaitre un signe opérateur basique (+ et -)
 let resultF= 0
 let arraySimplifie = []
@@ -47,8 +47,16 @@ function isNotNumber(args){
 function isolationParenthese(array) {
 
     arr = [...array]
-    //boucle sur le tableau de base 
+
+    //boucle sur le tableau 
     for (let i = 0; i < arr.length; i++) {
+        console.log("on recommence dans le FOR ! on compare : " + arr[i]);
+
+        //permet de vérifier que le calcul ne comporte plus de ()
+        let countComa = 0
+        arr.forEach(char => {
+            if (char.includes("(")) countComa ++
+        });
 
         let indexComaStart = 0
         let comaCalculLength = 0
@@ -57,7 +65,8 @@ function isolationParenthese(array) {
 
         //on trouve la parenthèse ouvrante, on sotck son index on truve la parenthèse fermante, on stock son index et on définit la taille de l'expression dans la paranthèse pour la calculer et la retourner
         if (arr[i].includes("(")) {
-            console.log(arr);
+
+            console.log("il y a une ( dans : "+ arr);
 
             indexComaStart = i
             for (let y = indexComaStart; y < arr.length; y++) {
@@ -77,35 +86,55 @@ function isolationParenthese(array) {
 
             //on refait notre arr pour la suite : 
             let arraySansComa = stringSansComa.split(",")
+            console.log("sansComa :" +arraySansComa);
 
             //On fais les calculs des opérateurs prioritaires
             arrSansPrio = calculSignePrio(arraySansComa)
+            console.log("prio :"+ arrSansPrio);
 
             //on fait les derniers calculs
             arrSansBasic = calculSigneBasic(arrSansPrio)
-            console.log("ici:  "+arrSansBasic);
+            console.log("1)basic :  "+arrSansBasic);
 
             //si notre retour fais length = 1 on return sinon on recommence
-            if (arrSansBasic.length > 1) {
-                isolationParenthese(arrSansBasic)
+            if (countComa > 1) {
+                console.log("2)basic :  "+arrSansBasic);
+
+                console.log("encore des parenthèse ?");
+                
+                console.log("1)état tableau avant splice : "+arr);
+                //on remplace la partie qu'on vient de calculer et on passe à l'autre parenthese
+                console.log("elem à remplacer dans arr: "+ arr[i] + " > à emplacement : "+ i);
+                arr.splice(i, 0, arrSansBasic.toString())
+                console.log("1)état tableau APRÈS splice : "+arr);
+
+
+                console.log("on reboucle !!!");
+                //donc pour ça on rappelle la f() elle meme
+                isolationParenthese(arr)
             }
 
+            console.log("2)état tableau avant splice : "+arr);
+
+            console.log("élém remplacé: "+arrSansBasic +" , à l'index : "+ i);
             //on return le tableau de base simplifié par les parenthèse
-            // //si le signe précédent est un sign prio et que notre resultat ==0 alors retourner 1
+            arr.splice(i, 0, arrSansBasic.toString())
+
+            console.log("2)état tableau APRÈS splice : "+arr);
+
+
+            //si le signe précédent est un signe prio et que notre resultat ==0 alors retourner 1 (sinon fausse le calcul)
             // if (arr[i-1].match(signePrioRgx) && arrSansBasic[0] == 0) {
+            //     console.log("return 1 pour pas kill le calcul");
             //     arr.splice(i, 0, 1)
             //     return arr
             // } 
-            
-            // let resultArr = arr.splice(i, 0, arrSansBasic[0])
-            // console.log(resultArr);
-            arr.splice(i, 0, arrSansBasic[0])
 
             return arr
         }
-        //pas de () donc on renvois au code de base
-        else return arr
     }
+    //pas de () donc on renvois au code de base
+    return arr
 
 }
 
@@ -125,41 +154,58 @@ function calculSignePrio(arr) {
                 case "*":
                     //On fait le calcul
                     resultF = nombrePreced * nombreSuiv
-                    //On supprime le bloc qu'on vient de calculer du arr
-                    arr.splice(i-1, i+1)
-                    //on réinsère la valeur à l'endroit du calcul
-                    arr[i] = resultF
 
-                    return arr;
+                    //On supprime le bloc qu'on a calculé et on remplace par notre résultat
+                    arr.splice(i-1, 3, resultF)
+                    console.log("res multiplication:  "+arr);
+
+                    //si dernier calcul on retourn la valeur
+                    if (arr.length == 1) {
+                        return resultF
+                    } else {
+                    //Sinon on va voir remplacer par un chiffre
+                        return arr
+                    }
 
                 case "/":
                     //On fait le calcul
                     resultF = nombrePreced / nombreSuiv
-                    //On supprime le bloc du arr
-                    arr.splice(i-1, i+1)
-                    //on réinsère la valeur à l'endroit du calcul
-                    arr[i-1] = resultF
 
-                    return arr;
+                    //On supprime le bloc qu'on a calculé et on remplace par notre résultat
+                    arr.splice(i-1, 3, resultF)
+                    console.log(arr);
+
+                    //si dernier calcul on retourn la valeur
+                    if (arr.length == 1) {
+                        return resultF
+                    } else {
+                    //Sinon on va voir remplacer par un chiffre
+                        return arr
+                    }
 
                 case "%":
+                    //on fait le calcul
                     resultF = nombrePreced % nombreSuiv
-                    //On supprime le bloc du arr
-                    arr.splice(i-1, i+1)
-                    //on réinsère la valeur à l'endroit du calcul
-                    arr[i-1] = resultF
-                    // console.log(arr)
-                    return arr;
+
+                    //On supprime le bloc qu'on a calculé et on remplace par notre résultat
+                    arr.splice(i-1, 3, resultF)
+                    console.log(arr);
+
+                    //si dernier calcul on retourn la valeur
+                    if (arr.length == 1) {
+                        return resultF
+                    } else {
+                    //Sinon on va voir remplacer par un chiffre
+                        return arr
+                    }
 
                 default:
-
                     break;
             }
         } 
-        //si aucun on return pour traiter le cas suivant
-        else return arr 
     }
-    
+    //si aucun on return pour traiter le cas suivant
+    return arr 
 }
 
 
@@ -181,7 +227,7 @@ function calculSigneBasic(arr) {
 
                     //On supprime le bloc qu'on a calculé et on remplace par notre résultat
                     arr.splice(i-1, 3, resultF)
-                    console.log(arr);
+                    console.log("res addition: "+arr);
                     
                     //si dernier calcul on retourn la valeur
                     if (arr.length == 1) {
@@ -191,22 +237,20 @@ function calculSigneBasic(arr) {
                         return arr
                     }
 
-                    break;
-
                 case "-":
+                    //on fait le calcul
                     resultF = nombrePreced - nombreSuiv
-                    //On supprime le bloc du arr
-                    arr.splice(i-1, i+1)
 
-                    //on réinsère la valeur à l'endroit du calcul (si plus assez délément on return la réponse)
-                    if (arr.length < 4) {
-                        return arr = [resultF]
+                    //On supprime le bloc qu'on a calculé et on remplace par notre résultat
+                    arr.splice(i-1, 3, resultF)
+
+                    //si dernier calcul on retourn la valeur
+                    if (arr.length == 1) {
+                        return resultF
+                    } else {
+                    //Sinon on va voir remplacer par un chiffre
+                        return arr
                     }
-
-                    //on affecte la valeur au tableau
-                    arr[i-1] = resultF
-                    // console.log(arr)
-                    return arr;
 
                 default:
 
@@ -220,8 +264,6 @@ function calculSigneBasic(arr) {
 function operation(calcul){
     console.log(calcul);
     let strArr = calcul.split(" ")
-
-
 
     //etape 1 suppression parenthèse
     strArr = isolationParenthese(strArr)
@@ -239,12 +281,14 @@ function operation(calcul){
 
     //si on a pas encore de résultat on reboucle en passant un argument conforme
     if (strArr.length >1) {
+        console.log("on relance car soucis");
         operation(strArr.join().replaceAll(",", " "));
-    } else {
-        resultCalcul = strArr
-        console.log("res : "+resultCalcul);
-        return resultCalcul
-    }
+    } 
+    // else {
+    //     resultCalcul = strArr
+    //     console.log("res : "+resultCalcul);
+    //     return resultCalcul
+    // }
 }
 
 
