@@ -27,7 +27,48 @@ Introuvable
 
 Vous devez gérer les potentiels problèmes d’arguments et de lecture de fichiers.
 
-
-
-
 */
+
+//Import de dépendances
+const spawn = require('child_process').spawnSync;
+
+//Initialisation des variables
+let args = process.argv
+let arg1 = args[2]
+let arg2 = args[3]
+let arg3 = args[4]
+const encodage = 'utf8'
+let datas
+
+//f() utlisées
+function getFileContent(fileName){
+    console.log(fileName);
+    const fs = require('fs');
+
+    datas = fs.readFileSync(fileName, encodage)
+    return datas
+}
+
+//main f()
+function getTheForm(gameBoardFile, toFindFile) {
+
+    //récupération et stockage du contenu du plateau de base
+    let gameBoard = getFileContent(gameBoardFile);
+    console.log(gameBoard);
+
+    //récupération et stockage du contenu de ce qui est cherché
+    let toFind = getFileContent(toFindFile);
+    console.log(toFind);
+}
+
+
+// gestion d'erreurs
+if (arg1 == undefined || arg2 == undefined || arg3 !== undefined) {
+    console.log("Merci d'entrer seulement 2 arguments valables");
+    return
+}
+
+//Traitement
+let resultFinal = getTheForm(arg1, arg2)
+
+console.log(resultFinal);

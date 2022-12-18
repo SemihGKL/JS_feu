@@ -56,7 +56,10 @@ function isolationParenthese(array) {
         let countComa = 0
         arr.forEach(char => {
             if (char.includes("(")) countComa ++
+            console.log("count ( : "+ char);
+            console.log(countComa);
         });
+        console.log("finalCount in for : " + countComa );
 
         let indexComaStart = 0
         let comaCalculLength = 0
@@ -70,7 +73,7 @@ function isolationParenthese(array) {
 
             indexComaStart = i
             for (let y = indexComaStart; y < arr.length; y++) {
-                if (array[y].includes(")")) {
+                if (arr[y].includes(")")) {
                     comaCalculLength = y - i
                     break
                 }
@@ -93,12 +96,11 @@ function isolationParenthese(array) {
             console.log("prio :"+ arrSansPrio);
 
             //on fait les derniers calculs
-            arrSansBasic = calculSigneBasic(arrSansPrio)
+            arrSansBasic = calculSigneBasic(arrSansPrio);
             console.log("1)basic :  "+arrSansBasic);
 
             //si notre retour fais length = 1 on return sinon on recommence
             if (countComa > 1) {
-                console.log("2)basic :  "+arrSansBasic);
 
                 console.log("encore des parenthèse ?");
                 
@@ -108,30 +110,23 @@ function isolationParenthese(array) {
                 arr.splice(i, 0, arrSansBasic.toString())
                 console.log("1)état tableau APRÈS splice : "+arr);
 
-
                 console.log("on reboucle !!!");
                 //donc pour ça on rappelle la f() elle meme
-                isolationParenthese(arr)
+                isolationParenthese(arr);
             }
-
+            
+            console.log("pour : "+  countComa);
             console.log("2)état tableau avant splice : "+arr);
 
             console.log("élém remplacé: "+arrSansBasic +" , à l'index : "+ i);
             //on return le tableau de base simplifié par les parenthèse
-            arr.splice(i, 0, arrSansBasic.toString())
+            arr.splice(i, 0, arrSansBasic.toString());
 
             console.log("2)état tableau APRÈS splice : "+arr);
 
-
-            //si le signe précédent est un signe prio et que notre resultat ==0 alors retourner 1 (sinon fausse le calcul)
-            // if (arr[i-1].match(signePrioRgx) && arrSansBasic[0] == 0) {
-            //     console.log("return 1 pour pas kill le calcul");
-            //     arr.splice(i, 0, 1)
-            //     return arr
-            // } 
-
-            return arr
+            return arr;
         }
+        console.log("hors du if : "+arr);
     }
     //pas de () donc on renvois au code de base
     return arr
