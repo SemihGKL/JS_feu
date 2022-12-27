@@ -27,6 +27,11 @@ Introuvable
 
 Vous devez gérer les potentiels problèmes d’arguments et de lecture de fichiers.
 
+
+1 - Pour faire simple chaque fois que je trouve une égalité entre un chiffre du plateau et le premier chiffre de ma recherche (et que l'emplacement de recherche et possible, donc que ça dépasserait pas du tableau) alors je créé un tableau de test qui a la même forme que mon tableau de recherche.  
+2 - Ensuite je parcours mon tableau de recherche et s'il trouve un espace il remplace la valeur du tableau test par un espace.  
+3 - Ensuite je compare les deux tableaux et je sauvegarde les coordonnées, puis je continue et répète tout ça sachant qu'à chaque résultat je compare les coordonnées pour sauvegarder le résultat seulement s'il est plus en haut à droite que le résultat précédemment sauvegardé.  
+4 - Et enfin j'ai des boucles qui me permettent d'afficher correctement le résultat
 */
 
 //Import de dépendances
@@ -49,24 +54,165 @@ function getFileContent(fileName){
     return datas
 }
 
+function decoupageTableau(array) {
+    let splitedArr = array.split("\n")
+    //On découpe les lignes du plateau sur chaque éléments
+    for (let i = 0; i < splitedArr.length; i++) {
+        splitedArr[i] = splitedArr[i].split('')
+    }
+    return splitedArr
+}
+
 //main f()
 function getTheForm(gameBoardFile, toFindFile) {
 
     //récupération et stockage du contenu du plateau de base
     let gameBoard = getFileContent(gameBoardFile);
-    console.log(gameBoard);
-
     //récupération et stockage du contenu de ce qui est cherché
     let toFind = getFileContent(toFindFile);
-    console.log(toFind);
+
+    //decoupage game board
+    let splitedGB = decoupageTableau(gameBoard);
+
+    //decoupage forme recherchée
+    let splitedToFind = decoupageTableau(toFind);
+
+
+    //Début recherches
+    let arrTemp = []
+
+    //Pour chaque sous tableau de la forme recherché
+    for (let y = 0; y < splitedToFind.length; y++) {
+        let z = 0
+        // console.log("On est dans cette partie de ce qu'on recherche : " + splitedToFind[y]);
+        let lengthLigneToFind = splitedToFind[y].length
+
+        //Pour chaque valeur dans chaque sous tableau de la forme recherché
+        for (let a = 0; a < splitedToFind[y].length; a++) {
+            // console.log("pour cette valeur : " + splitedToFind[y][a]);
+
+            
+            //On recherche dans chaque ligne de notre GB
+            for (let i = 0; i < splitedGB.length; i++) {
+                // console.log(splitedGB[i]);
+    
+                let posLigneGB
+                let posColonneGB
+                let posLigneTF
+                let posColonneTF
+
+                //Dans chaque élément de chaque ligne de notre GB
+                for (let x = 0; x < splitedGB[i].length; x++) {
+
+                    //Si l'élement est égale à celui recherché 
+                    if (splitedGB[i][x] == splitedToFind[y][a]) {
+                        
+                        //c'est égal donc : 
+                        // console.log("c'est égal à l'index : " + x + " du GB de la ligne : " + i);
+
+                        //on se situe ici : 
+                        posLigneGB = i
+                        posColonneGB = x
+                        posLigneTF = y
+                        posColonneTF = a
+
+                        arrLigneTemp.push(splitedGB[i][x])
+
+                        //ici je dois sauvegarder mes coordonnées et comparer maintenant les coordonnées suivantes
+                        let verif = verificationForme(splitedToFind, splitedGB, posLigneGB, posColonneGB, posLigneTF, posColonneTF)
+
+                        if (verif) {
+                            //finis !
+                            console.log("terminé.");
+                            return
+                        } else {
+                            //ce n'est pas égale
+                            arrLigneTemp = []
+                            console.log("Pas bon. on reboucle.");
+
+                            //on implémente les curseurs colonnes
+
+                            
+                        }
+                        
+                    }
+                }
+            }
+        }
+    }
+}
+let arrLigneTemp = []
+let arrFinalTest = []
+
+function verificationForme(arrTF, arrGB, posLigneGB,  posColonneGB, posLigneTF, posColonneTF) {
+    
+    let indexColonneTFOrigin = posColonneTF;
+
+    //on met les positions à +1 pour l'élément suivant
+    posColonneTF ++
+    posColonneGB ++
+
+    //ici on boucle sur l'array de gb pour comparer avec l'elem du arrTF jusqu'au max de la taille de la ligne d'arrTF
+    for (let n = 0; n < (arrTF[posLigneTF].length); n++) {
+        let nextElemGB = arrGB[posLigneGB][posColonneGB]
+        // console.log(arrTF[0][posColonneTF]);
+        // return true
+
+        let nextElemTF = arrTF[posLigneTF][posLigneTF]
+        //console.log(nextElemTF);
+        // return true
+
+        //Si les éléments suivant correspondent
+        if (nextElemGB == nextElemTF) {
+
+            //on continue
+            console.log("ON EST EGAL avec GB : " + nextElemGB + "et TF : " + nextElemTF);
+
+            arrLigneTemp.push(arrGB[posLigneGB][posColonneGB])
+
+            //on incrémente pour passer à l'élément suivant
+            posColonneTF++
+            posColonneGB++
+            
+
+            //si on dépasse le tableau on passe à la ligne d'en dessous
+            if (posColonneTF ==  (arrTF[posLigneTF].length-1)) {
+                console.log("retour à la ligne");
+                posLigneGB++
+                posLigneTF++
+                //et on remet le curseur au début
+                posColonneTF =0
+                posColonneGB =0
+
+                //on sauvegarde la ligne de l'arr de test et on remet à 0
+                arrFinalTest.push(arrLigneTemp)
+                arrLigneTemp=[]
+            }
+
+            //on compare les 2 arr si ok on return les coordonnées et c'est good
+            let testFinishAlgo = JSON.stringify(arrFinalTest) === JSON.stringify(arrTF)
+            if (testFinishAlgo) {
+                console.log("FINIS !");
+                return true
+            }
+
+
+        } else {
+            //ce n'est pas égale donc on fait elemColonne+1 et on recommence
+            console.log("On est != avec GB : " + nextElemGB + "et TF : " + nextElemTF);
+            arrLigneTemp=[]
+            arrFinalTest=[]
+            return false
+        }
+    }
+    console.log("taille max : "+arrTF[posLigneTF].length);
+    console.log(arrFinalTest);
+
 }
 
 
 // gestion d'erreurs
-if (arg1 == undefined || arg2 == undefined || arg3 !== undefined) {
-    console.log("Merci d'entrer seulement 2 arguments valables");
-    return
-}
+
 
 //Traitement
 let resultFinal = getTheForm(arg1, arg2)
