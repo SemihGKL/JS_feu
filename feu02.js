@@ -26,12 +26,6 @@ $> ruby exo.rb board.txt unfindable.txt
 Introuvable
 
 Vous devez gérer les potentiels problèmes d’arguments et de lecture de fichiers.
-
-
-1 - Pour faire simple chaque fois que je trouve une égalité entre un chiffre du plateau et le premier chiffre de ma recherche (et que l'emplacement de recherche et possible, donc que ça dépasserait pas du tableau) alors je créé un tableau de test qui a la même forme que mon tableau de recherche.  
-2 - Ensuite je parcours mon tableau de recherche et s'il trouve un espace il remplace la valeur du tableau test par un espace.  
-3 - Ensuite je compare les deux tableaux et je sauvegarde les coordonnées, puis je continue et répète tout ça sachant qu'à chaque résultat je compare les coordonnées pour sauvegarder le résultat seulement s'il est plus en haut à droite que le résultat précédemment sauvegardé.  
-4 - Et enfin j'ai des boucles qui me permettent d'afficher correctement le résultat
 */
 
 //Import de dépendances
@@ -44,12 +38,10 @@ let arg2 = args[3]
 let arg3 = args[4]
 const encodage = 'utf8'
 let datas
+const fs = require('fs');
 
 //f() utlisées
 function getFileContent(fileName){
-    console.log(fileName);
-    const fs = require('fs');
-
     datas = fs.readFileSync(fileName, encodage)
     return datas
 }
@@ -119,20 +111,23 @@ function getTheForm(gameBoardFile, toFindFile) {
                         arrLigneTemp.push(splitedGB[i][x])
 
                         //ici je dois sauvegarder mes coordonnées et comparer maintenant les coordonnées suivantes
+
+                        //on supprime le dernier sous tableau du array TF
+                        splitedToFind.pop()
+
                         let verif = verificationForme(splitedToFind, splitedGB, posLigneGB, posColonneGB, posLigneTF, posColonneTF)
 
                         if (verif) {
                             //finis !
-                            console.log("terminé.");
                             return
                         } else {
                             //ce n'est pas égale
                             arrLigneTemp = []
-                            console.log("Pas bon. on reboucle.");
+                            // console.log("Pas bon. on reboucle.");
+                            // console.log("-------");
+
 
                             //on implémente les curseurs colonnes
-
-                            
                         }
                         
                     }
@@ -140,12 +135,15 @@ function getTheForm(gameBoardFile, toFindFile) {
             }
         }
     }
+    console.log("Introuvable.");
 }
 let arrLigneTemp = []
 let arrFinalTest = []
 
 function verificationForme(arrTF, arrGB, posLigneGB,  posColonneGB, posLigneTF, posColonneTF) {
     
+    let indexColonneGBOrigin = posColonneGB;
+    // console.log(indexColonneGBOrigin);
     let indexColonneTFOrigin = posColonneTF;
 
     //on met les positions à +1 pour l'élément suivant
@@ -153,68 +151,101 @@ function verificationForme(arrTF, arrGB, posLigneGB,  posColonneGB, posLigneTF, 
     posColonneGB ++
 
     //ici on boucle sur l'array de gb pour comparer avec l'elem du arrTF jusqu'au max de la taille de la ligne d'arrTF
-    for (let n = 0; n < (arrTF[posLigneTF].length); n++) {
+    for (let n = 0; n < (arrGB[posLigneGB].length); n++) {
         let nextElemGB = arrGB[posLigneGB][posColonneGB]
-        // console.log(arrTF[0][posColonneTF]);
+        // console.log("nextGB : "+nextElemGB);
         // return true
 
-        let nextElemTF = arrTF[posLigneTF][posLigneTF]
-        //console.log(nextElemTF);
-        // return true
+        let nextElemTF = arrTF[posLigneTF][posColonneTF]
+        // console.log("nextTF : "+nextElemTF);
 
-        //Si les éléments suivant correspondent
-        if (nextElemGB == nextElemTF) {
+        //Si les éléments suivant correspondent ou que vide
+        if (nextElemGB == nextElemTF || nextElemTF == " ") {
 
             //on continue
-            console.log("ON EST EGAL avec GB : " + nextElemGB + "et TF : " + nextElemTF);
+            // console.log("ON EST EGAL avec GB : " + nextElemGB + " --et TF : " + nextElemTF);
 
-            arrLigneTemp.push(arrGB[posLigneGB][posColonneGB])
+            //on ajoute l'élement à la ligne
+            if (nextElemTF == " ") {
+                arrLigneTemp.push(" ")
+                // console.log("on passe à la suite");
+            } else {
+                arrLigneTemp.push(arrGB[posLigneGB][posColonneGB])
+            }
 
             //on incrémente pour passer à l'élément suivant
             posColonneTF++
             posColonneGB++
-            
 
             //si on dépasse le tableau on passe à la ligne d'en dessous
-            if (posColonneTF ==  (arrTF[posLigneTF].length-1)) {
-                console.log("retour à la ligne");
+            if (posColonneTF ==  (arrTF[posLigneTF].length)) {
+                // console.log("retour à la ligne");
+                //on reprendre le compteur
+
                 posLigneGB++
                 posLigneTF++
+
                 //et on remet le curseur au début
                 posColonneTF =0
-                posColonneGB =0
+                posColonneGB = indexColonneGBOrigin
 
-                //on sauvegarde la ligne de l'arr de test et on remet à 0
+                //Comme on est au bout de la ligne
+                //on sauvegarde la ligne de l'arr de test 
                 arrFinalTest.push(arrLigneTemp)
+                //On remet à 0 l'array
                 arrLigneTemp=[]
             }
 
             //on compare les 2 arr si ok on return les coordonnées et c'est good
             let testFinishAlgo = JSON.stringify(arrFinalTest) === JSON.stringify(arrTF)
+
             if (testFinishAlgo) {
-                console.log("FINIS !");
+                console.log("Trouvé !");
+                console.log("Coordonnées : " + posLigneGB +","+ posColonneGB);
                 return true
             }
 
 
         } else {
             //ce n'est pas égale donc on fait elemColonne+1 et on recommence
-            console.log("On est != avec GB : " + nextElemGB + "et TF : " + nextElemTF);
+            // console.log("On est != avec GB : " + nextElemGB + "et TF : " + nextElemTF);
+
+            //on reset les arr
             arrLigneTemp=[]
             arrFinalTest=[]
             return false
         }
     }
-    console.log("taille max : "+arrTF[posLigneTF].length);
-    console.log(arrFinalTest);
+    // console.log("taille max : "+arrTF[posLigneTF].length);
+    // console.log(arrFinalTest);
 
 }
 
+//vérifier la présence d'un fichier dans l'arborescence
+function isNotFile(args) {
+    for (let i = 0; i < args.length; i++) {
+        if (fs.existsSync(args[i]) == true) {
+            //on fait r
+        } else {
+            return false
+        }
+    }
+    return true
+}
 
 // gestion d'erreurs
+if (arg1 == undefined || arg2 == undefined || arg3 !== undefined) {
+    console.log("Merci d'entrer que 2 arguments valables");
+    return
+}
+
+if (isNotFile(args)) {
+    //good on fait rien
+} else {
+    console.log("Aucun fichier trouvé");
+    return
+}
 
 
 //Traitement
-let resultFinal = getTheForm(arg1, arg2)
-
-console.log(resultFinal);
+getTheForm(arg1, arg2)
