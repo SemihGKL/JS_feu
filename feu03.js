@@ -30,9 +30,10 @@ $> ruby exo.rb s.txt
 Afficher error et quitter le programme en cas de problèmes d’arguments.
 
 
-1- Commencez par représenter le sudoku sous forme d'un tableau à deux dimensions contenant des chiffres de 1 à 9. Si une case est vide, utilisez la valeur 0.
+1- Commencez par représenter le sudoku sous forme d'un tableau à deux dimensions contenant des chiffres de 1 à 9. Si une case est vide, utilisez la valeur 0. > FAIT
 
 2- Écrivez une fonction qui prend en entrée le tableau du sudoku et qui retourne un booléen indiquant si la grille est valide ou non. Pour vérifier la validité, vous pouvez vérifier que chaque ligne, chaque colonne et chaque région 3x3 contient tous les chiffres de 1 à 9.
+> StandBy
 
 3- Écrivez une fonction récursive qui essaie de remplir la grille de sudoku de manière récursive en testant chaque valeur possible pour chaque case vide. Si la grille est valide après avoir rempli une case, passez à la case suivante et continuez à remplir la grille de manière récursive. Si la grille devient invalide à un certain point, revenez en arrière et essayez une autre valeur pour la case précédemment remplie.
 
@@ -46,6 +47,8 @@ let args = process.argv
 let arg1 = args[2]
 let arg2 = args[3]
 let arg3 = args[4]
+const fs = require('fs');
+const encodage = 'utf8'
 let datas
 
 
@@ -58,13 +61,93 @@ function getFileContent(fileName){
 }
 
 //f() qui découpe le sudoku en ligne
-function twoDimensionArrSudoku() {
+function twoDimensionArrSudoku(arr) {
+    //on découpe en ligne de 9 char
+    let lignesArr = arr.split("\n")
+
+    let sudokuArr = []
+
+    //on met en place notre tableau à 2 dimensions
+    for (const ligne of lignesArr) {
+        //on remplace les . par des 0
+        let sdkLine = ligne.split('').map( x => {
+            return x.replace('.', '0')
+        })
+        sudokuArr.push(sdkLine)
+    }
+    return sudokuArr
+}
+
+//Permet de vérifier les carrés de 3x3 contiennent bien les 9 chiffres ainsi que sur une ligne et une colonne
+function verifAllNb(arr) {
+
+    //----Première verification sur les lignes----
+
+    //J'initialise un compteur à 0 pour chaque chiffre de 1 à 9
+    const counters = new Array(9).fill(0);
+    // console.log(counters);
+
+    let isSDK = true
+    // for (const ligne of arr) {
+    for (let i = 0; i < arr.length; i++) {
+
+        // Crée un tableau de compteurs à 0
+        const counters = new Array(9).fill(0);
+
+        // Parcours chaque élément du sudoku
+        for (const element of arr[i]) {
+            // Récupère le chiffre de la case
+            const number = parseInt(element, 10);
+
+            // Incrémente le compteur du chiffre
+            counters[number - 1]++;
+        }
+
+        // Vérifie que chaque compteur a la valeur 1
+        for (let y = 0; y < counters.length; y++) {
+            
+            if (counters[y] !== 1) {
+                console.log("dans la ligne n° "+ i + " l'elem qui n'apparait pas est : " + (y+1));
+                //ce n'est pas un sudoku valide
+                return isSDK = false
+            }
+        }
+    }
+
+
+    //----vérification sur les colonnes----
+    for (let i = 0; i < arr.length; i++) {
+        
+    }
+
+
+
+
+
+
+}
+
+function calculSudoku(arr, state) {
+    //c'est finis
+    if (state) {
+        return arr.join()
+    }
+
+    //on ajoute un nombre de 1 à 10 et on reteste
+
+
+
 
 }
 
 //main f()
 function resolveSudo(sdkFile) {
+    let arrayBase = getFileContent(sdkFile)
+    let twoDimArray = twoDimensionArrSudoku(arrayBase)
+    let isSudokuArr = verifAllNb(twoDimArray)
     
+    let finalSudoku = 
+
 
 }
 
@@ -74,3 +157,4 @@ function resolveSudo(sdkFile) {
 
 
 //resultat
+resolveSudo(arg1)
