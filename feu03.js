@@ -79,52 +79,71 @@ function twoDimensionArrSudoku(arr) {
 }
 
 //Permet de vérifier les carrés de 3x3 contiennent bien les 9 chiffres ainsi que sur une ligne et une colonne
-function verifAllNb(arr) {
+function verifLigne(arr) {
 
     //----Première verification sur les lignes----
 
-    //J'initialise un compteur à 0 pour chaque chiffre de 1 à 9
-    const counters = new Array(9).fill(0);
-    // console.log(counters);
-
-    let isSDK = true
-    // for (const ligne of arr) {
+    // let isSDK = true
+    // // for (const ligne of arr) {
     for (let i = 0; i < arr.length; i++) {
-
-        // Crée un tableau de compteurs à 0
-        const counters = new Array(9).fill(0);
-
-        // Parcours chaque élément du sudoku
-        for (const element of arr[i]) {
-            // Récupère le chiffre de la case
-            const number = parseInt(element, 10);
-
-            // Incrémente le compteur du chiffre
-            counters[number - 1]++;
-        }
-
-        // Vérifie que chaque compteur a la valeur 1
-        for (let y = 0; y < counters.length; y++) {
-            
-            if (counters[y] !== 1) {
-                console.log("dans la ligne n° "+ i + " l'elem qui n'apparait pas est : " + (y+1));
-                //ce n'est pas un sudoku valide
-                return isSDK = false
-            }
-        }
+        let ligne = arr[i]
+        verifNumbers(ligne)
     }
 
+    console.log("verif line finish");
+    
+    //stocker la valeur de retour et si la valeur n'est pas a false, on continue en tester les carré 3x3
+    verifColonne(arr)
+
+}
+
+function verifColonne(arr) {
 
     //----vérification sur les colonnes----
-    for (let i = 0; i < arr.length; i++) {
-        
+
+  
+
+    //On boucle 9 fois pour chaque colonne
+    for (let y = 0; y < 9; y++) {
+        let tempArr = []
+
+        //pour chaque ligne
+        for (let i = 0; i < arr.length; i++) {
+            //remplir le tableau avec les élément qui sont l'un au dessus de l'autre
+            tempArr.push(arr[i][y])
+        }
+        verifNumbers(tempArr)
+    
+        console.log(tempArr);
     }
 
+}
 
+//Vérifie si dans la ligne donnée on à les chiffres de 1 à 9
+function verifNumbers(ligne) {
 
+    // Crée un tableau de compteurs à 0
+    const counters = new Array(9).fill(0);
 
+    // Parcours chaque élément du sudoku
+    for (const element of ligne) {
+        // Récupère le chiffre de la case
+        const number = parseInt(element, 10);
 
+        // Incrémente le compteur du chiffre
+        counters[number - 1]++;
+    }
 
+    // Vérifie que chaque compteur a la valeur 1
+    for (let y = 0; y < counters.length; y++) {
+        
+        if (counters[y] !== 1) {
+            console.log("l'elem qui n'apparait pas est : " + (y+1));
+            //ce n'est pas un sudoku valide
+            //il faudra return un indicateur pour stopper les tests
+            // return isSDK = false //décommenter pour tester
+        }
+    }
 }
 
 function calculSudoku(arr, state) {
@@ -144,9 +163,9 @@ function calculSudoku(arr, state) {
 function resolveSudo(sdkFile) {
     let arrayBase = getFileContent(sdkFile)
     let twoDimArray = twoDimensionArrSudoku(arrayBase)
-    let isSudokuArr = verifAllNb(twoDimArray)
+    let isSudokuArr = verifLigne(twoDimArray)
     
-    let finalSudoku = 
+    // let finalSudoku = calculSudoku()
 
 
 }
