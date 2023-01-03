@@ -87,13 +87,29 @@ function verifLigne(arr) {
     // // for (const ligne of arr) {
     for (let i = 0; i < arr.length; i++) {
         let ligne = arr[i]
-        verifNumbers(ligne)
+         let testLigneSudoku = verifNumbers(ligne)
+         if (testLigneSudoku) {
+            //on continue les verifs > sudoku valide
+            console.log("valid verifNb #0");
+
+         } else {
+            console.log("ligne verifs NB NON");
+            return false
+         }
     }
 
-    console.log("verif line finish");
-    
-    //stocker la valeur de retour et si la valeur n'est pas a false, on continue en tester les carré 3x3
-    verifColonne(arr)
+    let testColonne = verifColonne(arr)
+    console.log(testColonne);
+    if (testColonne) {
+        //on continue les verifs > sudoku valide
+        console.log("valid  #0");
+
+    } else {
+        console.log("colonne = "+ testColonne);
+        return false
+    }
+
+    return true
 
 }
 
@@ -111,14 +127,26 @@ function verifColonne(arr) {
             tempArr.push(arr[i][y])
         }
 
-        verifNumbers(tempArr)
+        let testSudoku = verifNumbers(tempArr)
+        if (testSudoku) {
+            //on continue les vérifs > sudoku valide
+            console.log("valid verifNb #1");
+        } else {
+            console.log("colonne verifs NB NON");
+            return false
+        }
 
-        //stocker le retour et retourner en fonction ce qu'il faut
+    }
+    //tester les carrés 3x3
+    let testCarre = verifCarre(arr)
+    if (testCarre) {
+        //notre sudoku est parfaitement valide
+        console.log("valid  #1");
 
-        //tester les carrés 3x3
-        verifCarre(arr)
-        return
-        // console.log(tempArr);
+        return true
+    } else {
+        console.log("carré = "+ testCarre);
+        return false
     }
 }
 
@@ -170,11 +198,17 @@ function verifCarre(arr) {
         let testSudoku = verifNumbers(carreLigneArr[i])
         if (testSudoku) {
             //Good on fait rien on continue de boucler
+            console.log("valid verifNb #2");
+
         } else {
+            console.log("cube verifs NB NON");
+
             return false
         }
     }
     //on a donc un sudoku valide pour cette partie
+    console.log("valid  #2");
+
     return true
 
 }
@@ -199,13 +233,14 @@ function verifNumbers(ligne) {
     for (let y = 0; y < counters.length; y++) {
         
         if (counters[y] !== 1) {
-            // console.log("l'elem qui n'apparait pas est : " + (y+1));
+            console.log("l'elem qui n'apparait pas est : " + (y+1));
             //ce n'est pas un sudoku valide
             //il faudra return un indicateur pour stopper les tests
-            return isSDK = false 
+            return false 
         }
     }
 
+    return true
 }
 
 function calculSudoku(arr, state) {
@@ -224,6 +259,13 @@ function resolveSudo(sdkFile) {
     let arrayBase = getFileContent(sdkFile)
     let twoDimArray = twoDimensionArrSudoku(arrayBase)
     let isSudokuArr = verifLigne(twoDimArray)
+
+    if (isSudokuArr) {
+        //le sudoku est valide pas besoin d'aller plus loin
+        console.log("sudoku is ok");
+    } else {
+        console.log("sudoku DONT");
+    }
     
     // let finalSudoku = calculSudoku()
 
