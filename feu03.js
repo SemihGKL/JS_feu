@@ -78,7 +78,7 @@ function twoDimensionArrSudoku(arr) {
     return sudokuArr
 }
 
-//Permet de vérifier les carrés de 3x3 contiennent bien les 9 chiffres ainsi que sur une ligne et une colonne
+//Permet de vérifier les les lignes
 function verifLigne(arr) {
 
     //----Première verification sur les lignes----
@@ -101,8 +101,6 @@ function verifColonne(arr) {
 
     //----vérification sur les colonnes----
 
-  
-
     //On boucle 9 fois pour chaque colonne
     for (let y = 0; y < 9; y++) {
         let tempArr = []
@@ -112,12 +110,75 @@ function verifColonne(arr) {
             //remplir le tableau avec les élément qui sont l'un au dessus de l'autre
             tempArr.push(arr[i][y])
         }
+
         verifNumbers(tempArr)
-    
-        console.log(tempArr);
+
+        //stocker le retour et retourner en fonction ce qu'il faut
+
+        //tester les carrés 3x3
+        verifCarre(arr)
+        return
+        // console.log(tempArr);
+    }
+}
+
+function verifCarre(arr) {
+    //----vérification sur les carrés de 3x3 ----
+    let tempArrGroupe = []
+
+
+    //On forme 3 sous groupe avec les tableaux pour parcours 3 lignes / 3 lignes par la suite
+    for (let i = 0; i < arr.length; i += 3) {
+        let tempGroupe = arr.slice(i, i+3)
+        tempArrGroupe.push(tempGroupe)
     }
 
+    let tempArr =[]
+    let tempLigne
+    let indexStart = 0
+    let carreLigneArr = []
+
+    //pour traiter toutes les colonnes de sous groupes
+    for (let a = 0; a < tempArrGroupe.length; a++) {
+        
+        //Pour chaque sous groupe créé,
+        for (let y = 0; y < tempArrGroupe.length; y++) {
+            //on prends un sous tableau et on extrait les 3 premier éléments
+            for (let z=0; z < tempArrGroupe[y].length; z++) {
+                
+                let indexEnd =indexStart+3
+    
+                tempLigne = tempArrGroupe[y][z].slice(indexStart, indexEnd);
+                tempArr.push(tempLigne)
+    
+            }
+            tempArr = tempArr.flat(1);
+            carreLigneArr.push(tempArr)
+            tempArr= []
+        }
+
+
+        indexStart += 3
+    }
+
+
+    //On a dans carreLigneArr un tableau avec des sous tableau contenant nos carrées de 3x3
+    
+    //pour chaque ligne
+    for (let i = 0; i < carreLigneArr.length; i++) {
+        //On fait vérifier chaque ligne (ligne contenant nos carrés)
+        let testSudoku = verifNumbers(carreLigneArr[i])
+        if (testSudoku) {
+            //Good on fait rien on continue de boucler
+        } else {
+            return false
+        }
+    }
+    //on a donc un sudoku valide pour cette partie
+    return true
+
 }
+
 
 //Vérifie si dans la ligne donnée on à les chiffres de 1 à 9
 function verifNumbers(ligne) {
@@ -138,12 +199,13 @@ function verifNumbers(ligne) {
     for (let y = 0; y < counters.length; y++) {
         
         if (counters[y] !== 1) {
-            console.log("l'elem qui n'apparait pas est : " + (y+1));
+            // console.log("l'elem qui n'apparait pas est : " + (y+1));
             //ce n'est pas un sudoku valide
             //il faudra return un indicateur pour stopper les tests
-            // return isSDK = false //décommenter pour tester
+            return isSDK = false 
         }
     }
+
 }
 
 function calculSudoku(arr, state) {
@@ -153,9 +215,7 @@ function calculSudoku(arr, state) {
     }
 
     //on ajoute un nombre de 1 à 10 et on reteste
-
-
-
+    
 
 }
 
