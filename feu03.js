@@ -33,7 +33,7 @@ Afficher error et quitter le programme en cas de problèmes d’arguments.
 1- Commencez par représenter le sudoku sous forme d'un tableau à deux dimensions contenant des chiffres de 1 à 9. Si une case est vide, utilisez la valeur 0. > FAIT
 
 2- Écrivez une fonction qui prend en entrée le tableau du sudoku et qui retourne un booléen indiquant si la grille est valide ou non. Pour vérifier la validité, vous pouvez vérifier que chaque ligne, chaque colonne et chaque région 3x3 contient tous les chiffres de 1 à 9.
-> StandBy
+> FAIS
 
 3- Écrivez une fonction récursive qui essaie de remplir la grille de sudoku de manière récursive en testant chaque valeur possible pour chaque case vide. Si la grille est valide après avoir rempli une case, passez à la case suivante et continuez à remplir la grille de manière récursive. Si la grille devient invalide à un certain point, revenez en arrière et essayez une autre valeur pour la case précédemment remplie.
 
@@ -90,22 +90,21 @@ function verifLigne(arr) {
          let testLigneSudoku = verifNumbers(ligne)
          if (testLigneSudoku) {
             //on continue les verifs > sudoku valide
-            console.log("valid verifNb #0");
+            // console.log("valid verifNb #0");
 
          } else {
-            console.log("ligne verifs NB NON");
+            // console.log("ligne verifs NB NON");
             return false
          }
     }
 
     let testColonne = verifColonne(arr)
-    console.log(testColonne);
     if (testColonne) {
         //on continue les verifs > sudoku valide
-        console.log("valid  #0");
+        // console.log("valid  #0");
 
     } else {
-        console.log("colonne = "+ testColonne);
+        // console.log("colonne = "+ testColonne);
         return false
     }
 
@@ -130,9 +129,9 @@ function verifColonne(arr) {
         let testSudoku = verifNumbers(tempArr)
         if (testSudoku) {
             //on continue les vérifs > sudoku valide
-            console.log("valid verifNb #1");
+            // console.log("valid verifNb #1");
         } else {
-            console.log("colonne verifs NB NON");
+            // console.log("colonne verifs NB NON");
             return false
         }
 
@@ -141,11 +140,11 @@ function verifColonne(arr) {
     let testCarre = verifCarre(arr)
     if (testCarre) {
         //notre sudoku est parfaitement valide
-        console.log("valid  #1");
+        // console.log("valid  #1");
 
         return true
     } else {
-        console.log("carré = "+ testCarre);
+        // console.log("carré = "+ testCarre);
         return false
     }
 }
@@ -198,16 +197,15 @@ function verifCarre(arr) {
         let testSudoku = verifNumbers(carreLigneArr[i])
         if (testSudoku) {
             //Good on fait rien on continue de boucler
-            console.log("valid verifNb #2");
+            // console.log("valid verifNb #2");
 
         } else {
-            console.log("cube verifs NB NON");
+            // console.log("cube verifs NB NON");
 
             return false
         }
     }
     //on a donc un sudoku valide pour cette partie
-    console.log("valid  #2");
 
     return true
 
@@ -216,6 +214,9 @@ function verifCarre(arr) {
 
 //Vérifie si dans la ligne donnée on à les chiffres de 1 à 9
 function verifNumbers(ligne) {
+
+    // console.log("ligne ici : ");
+    // console.log(ligne);
 
     // Crée un tableau de compteurs à 0
     const counters = new Array(9).fill(0);
@@ -243,14 +244,60 @@ function verifNumbers(ligne) {
     return true
 }
 
-function calculSudoku(arr, state) {
-    //c'est finis
-    if (state) {
-        return arr.join()
+
+function calculSudoku(arr) {
+
+    //tableau qui contiendra tous les éléments manquant pour les ré-insérer
+    let missingNbArr = []
+
+    //prendre le tableau et remplacer tous les . par le chiffres manquant de 1 à 9
+    console.log(arr);
+    //tester le sudoku
+    for (let i = 0; i < arr.length; i++) {
+
+        // Crée un tableau de compteurs à 0
+        const counters = new Array(9).fill(0);
+
+        // Parcours chaque élément du sudoku
+        for (const element of arr[i]) {
+            // Récupère le chiffre de la case
+            const number = parseInt(element, 10);
+            // console.warn("elem :" +element);
+            
+
+            // Incrémente le compteur du chiffre
+            counters[number - 1]++;
+        }
+
+
+        // Vérifie que chaque compteur a la valeur 1
+        for (let y = 0; y < counters.length; y++) {
+            
+            if (counters[y] !== 1) {
+                console.log("l'elem qui n'apparait pas est : " + (y+1));
+                missingNbArr.push(y+1)
+
+            }
+        }
+        
     }
 
-    //on ajoute un nombre de 1 à 10 et on reteste
-    
+    //à ce stade on a un tableau qui comprends tous les éléments manquants on va parcourir les 0 et les remplacer par nos chiffres
+
+    let indexMissingNb = 0
+    for (let i = 0; i < arr.length; i++) {
+
+        for (let y = 0; y < arr.length; y++) {
+            if (arr[i][y] == 0) {
+                // console.log(arr[i][y]);
+                arr[i][y] = missingNbArr[indexMissingNb]
+                indexMissingNb++
+            }
+        }
+
+    }
+
+    return arr
 
 }
 
@@ -263,18 +310,53 @@ function resolveSudo(sdkFile) {
     if (isSudokuArr) {
         //le sudoku est valide pas besoin d'aller plus loin
         console.log("sudoku is ok");
+        return
     } else {
+        //il n'est pas valide on va essayer de trouver une solution
         console.log("sudoku DONT");
     }
     
-    // let finalSudoku = calculSudoku()
+    let finalSudoku = calculSudoku(twoDimArray)
 
+    let sudoku = ""
 
+    for (let i = 0; i < finalSudoku.length; i++) {
+        for (let y = 0; y < 9; y++) {
+            sudoku += finalSudoku[i][y]
+        }
+        sudoku += '\n'
+        
+    }
+
+    console.log(sudoku);
+
+}
+
+//vérifier la présence d'un fichier dans l'arborescence
+function isNotFile(args) {
+    for (let i = 0; i < args.length; i++) {
+        if (fs.existsSync(args[i]) == true) {
+            //on fait r
+        } else {
+            return false
+        }
+    }
+    return true
 }
 
 
 //gestion des erreurs
+if (arg1 == undefined || arg2 == undefined || arg3 !== undefined) {
+    console.log("Merci d'entrer que 2 arguments valables");
+    return
+}
 
+if (isNotFile(args)) {
+    //good on fait rien
+} else {
+    console.log("Aucun fichier trouvé");
+    return
+}
 
 
 //resultat
