@@ -58,3 +58,79 @@ for i in 0..y do
 end
 
 */
+
+//initialisation des variables
+let args = process.argv
+let arg1 = args[2]
+let arg2 = args[3]
+let arg3 = args[4]
+const fs = require('fs');
+const encodage = 'utf8'
+let datas
+
+//f() utilisées
+
+//permet de recup le contenu d'un fichier
+function getFileContent(fileName){
+    datas = fs.readFileSync(fileName, encodage)
+    return datas
+}
+
+//vérifier la présence d'un fichier dans l'arborescence
+function isNotFile(args) {
+    for (let i = 0; i < args.length; i++) {
+        if (fs.existsSync(args[i]) == true) {
+            //on fait r
+        } else {
+            return false
+        }
+    }
+    return true
+}
+
+
+
+// main f()
+function biggestCarre() {
+    //récupérer le plateau
+    const plateauAll = getFileContent(arg1)
+
+    console.log(plateauAll);
+
+    //récupérer la partie des différents indicateurs
+
+    //récupérer le plateau de jeu uniquement
+
+
+    //dans le tableau trouver un obstable
+
+    //ajouter +1 à droite et +1 en bas jusqu'à retomber sur un obstable
+
+    //conserver le nombre de +1 fait & stocker ses coordonnées dans un objet avec colonnes - lignes - progression
+
+    //faire ça pour tous les obstacles en partant de la droite et de la gauche
+
+
+    //comparer les progressions pour voir le quel est le plus grand 
+
+    //se positionner dessus et dessiner le carré
+
+    //afficher le résultat
+}
+
+
+//gestion des erreurs
+if (arg1 == undefined || arg2 == undefined || arg3 !== undefined) {
+    console.log("Merci d'entrer que 2 arguments valables");
+    return
+}
+
+if (isNotFile(args)) {
+    //good on fait rien
+} else {
+    console.log("Aucun fichier trouvé");
+    return
+}
+
+
+//traitement du résultat

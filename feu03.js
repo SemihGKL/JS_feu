@@ -358,6 +358,5 @@ if (isNotFile(args)) {
     return
 }
 
-
 //resultat
 resolveSudo(arg1)
