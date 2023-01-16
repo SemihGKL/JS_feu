@@ -63,10 +63,11 @@ end
 let args = process.argv
 let arg1 = args[2]
 let arg2 = args[3]
-let arg3 = args[4]
+
 const fs = require('fs');
 const encodage = 'utf8'
 let datas
+console.log(arg1);
 
 //f() utilisées
 
@@ -91,9 +92,9 @@ function isNotFile(args) {
 
 
 // main f()
-function biggestCarre() {
+function biggestCarre(file) {
     //récupérer le plateau
-    const plateauAll = getFileContent(arg1)
+    const plateauAll = getFileContent(file)
 
     console.log(plateauAll);
 
@@ -120,7 +121,7 @@ function biggestCarre() {
 
 
 //gestion des erreurs
-if (arg1 == undefined || arg2 == undefined || arg3 !== undefined) {
+if (arg1 == undefined || arg2 !== undefined) {
     console.log("Merci d'entrer que 2 arguments valables");
     return
 }
@@ -134,3 +135,4 @@ if (isNotFile(args)) {
 
 
 //traitement du résultat
+biggestCarre(arg1)
