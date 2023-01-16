@@ -99,6 +99,14 @@ function biggestCarre(file) {
     console.log(plateauAll);
 
     //récupérer la partie des différents indicateurs
+    const indicateur = plateauAll.split("\n")
+
+    console.log(indicateur[0]);
+    const nbLigne = indicateur[0][0]
+    const ptnMap = indicateur[0][1]
+    const obstacle = indicateur[0][2]
+    const markCarre = indicateur[0][3]
+    console.log(nbLigne, ptnMap, obstacle, markCarre);
 
     //récupérer le plateau de jeu uniquement
 
