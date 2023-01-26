@@ -67,7 +67,9 @@ let arg2 = args[3]
 const fs = require('fs');
 const encodage = 'utf8'
 let datas
-let allBoards = []
+let allSquares = []
+let max = 0
+let maxElement = []
 
 //f() utilisées
 
@@ -89,66 +91,42 @@ function isNotFile(args) {
     return true
 }
 
-/**
- * Permet de remplir un objet avec les coordonnées des différents obstacles
- * 
- * @param {*} indicateurs 
- * @returns 
- */
-function saveObstacle(indicateurs) {
-    //ancien if/else dans
-    // if (plateau[i][y] == "x") {
-    //     console.log("obstacle here");
-        
-    //     let posColonne = y
-    //     let posLigne = i
-    //     console.log(plateau[i][y]);
-
-    //     //trouver chaque obstacle et sauvegarder les coordonnées dans un tableau
-    //     let carreCordObj = {posColonne: posColonne, posLigne : posLigne}
-    //     let objArrName = "obstacle"+idxObstcl
-    //     console.log(objArrName);
-    //     allObstacleCoords[objArrName] = carreCordObj
-
-    //     idxObstcl++
-        
-    // } else {
-    //     //il ne se passe actuellement rien
-    // }
-}
-
 
 /**
  * Permet de tester et enregistrer les différentes possibilitées de carré pour chaque obstacle
  */
-function testCarre(board, i, j) {
-    // //on vérifie qu'on déborde pas du tableau et que se sont des fausses coordonnées 
-    boardTemp = [...board]
-    if (i < 0 || i >= boardTemp.length || j < 0 || j >= boardTemp[i].length) {
-        return 0;
+function testCarre(board, i, j, objName) {
+    let lgn = i, cln = j
+    let down, right, diagonal
+
+    for (let squareSize = 0; lgn < board.length-1; squareSize++) {
+        down = board[lgn+1][cln]
+        right = board[lgn][cln+1]
+        diagonal = board[lgn+1][cln+1]
+
+        cln++, lgn++
+        if (down == "x" || right == "x" || diagonal == "x") {
+            allSquares[objName].max = squareSize
+        }
     }
-
-    //si on tombe sur un x on arrete le traitement
-
-
-    let up = testCarre(boardTemp, i - 1, j);
-    let left = testCarre(boardTemp, i, j - 1);
-    let diagonal = testCarre(boardTemp, i - 1, j - 1);
-    let squareSize = Math.min(up, left, diagonal) + 1;
-
-    if (board[i][j] == "x") {
-        
-
-    }
-
-    boardTemp[i][j] = 'o';
-
-
-
-    // allBoards.push(boardTemp)
-    return squareSize;
+    return
 }
 
+function findBiggestOne(arrQuareSize) {
+    let squarBasicArray = []
+    for (let i = 0; i >= 0; i++) {
+        if (allSquares["obstacle"+i] == undefined) {
+            break
+        } else {
+            squarBasicArray.push(allSquares["obstacle"+i])
+        }
+    }
+
+    //il faut récupérer l'élément de squarBasicArray qui a la valeur max la plus élevée pour ensuite dessiner notre réponse
+    console.log(squarBasicArray)
+
+    console.log(Math.max(...squarBasicArray.map(o => o.y)))
+}
 
 // main f()
 function biggestCarre(file) {
@@ -169,6 +147,7 @@ function biggestCarre(file) {
     const plateau = indicateur.slice(1)
     console.log(plateau);
     let carreMax = 0
+    let idxObstcl= 0
 
     //dans le tableau trouver un obstable et tester ses carrés
     for (let i = 0; i < plateau.length; i++) {
@@ -176,19 +155,19 @@ function biggestCarre(file) {
         //traiter sur chaque élément de chaque ligne
         for (let j = 0; j < plateau[i].length; j++) {
 
-            if (plateau[i][j] == "x") {
-                console.log("obstacle here");
-                //pour chaque obstacle on va calculer ses carrés adjacents et retourner le plus grand
-                let tailleCarre = testCarre(plateau,i, j)
+            //je vais remplir un tableau d'objet avec le progression max de chaque case
+            let carreCordObj = {posLigne : i, posColonne: j, max }
+            let objArrName = "obstacle"+idxObstcl
+            allSquares[objArrName] = carreCordObj
 
-                // on va comparer les tailles de carrés et retourner le plus grand
-                carreMax = Math.max(carreMax, tailleCarre)
-                
-            }
+            testCarre(plateau, i, j, objArrName)
+
+            idxObstcl++
         }
-    }
-    console.log(allBoards);
 
+    }
+
+    findBiggestOne()
 }
 
 
