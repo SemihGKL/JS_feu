@@ -67,7 +67,8 @@ let arg2 = args[3]
 const fs = require('fs');
 const encodage = 'utf8'
 let datas
-let allBoards = []
+let allSquares = []
+let max
 
 //f() utilisées
 
@@ -89,66 +90,64 @@ function isNotFile(args) {
     return true
 }
 
-/**
- * Permet de remplir un objet avec les coordonnées des différents obstacles
- * 
- * @param {*} indicateurs 
- * @returns 
- */
-function saveObstacle(indicateurs) {
-    //ancien if/else dans
-    // if (plateau[i][y] == "x") {
-    //     console.log("obstacle here");
-        
-    //     let posColonne = y
-    //     let posLigne = i
-    //     console.log(plateau[i][y]);
-
-    //     //trouver chaque obstacle et sauvegarder les coordonnées dans un tableau
-    //     let carreCordObj = {posColonne: posColonne, posLigne : posLigne}
-    //     let objArrName = "obstacle"+idxObstcl
-    //     console.log(objArrName);
-    //     allObstacleCoords[objArrName] = carreCordObj
-
-    //     idxObstcl++
-        
-    // } else {
-    //     //il ne se passe actuellement rien
-    // }
-}
-
 
 /**
  * Permet de tester et enregistrer les différentes possibilitées de carré pour chaque obstacle
  */
-function testCarre(board, i, j) {
-    // //on vérifie qu'on déborde pas du tableau et que se sont des fausses coordonnées 
-    boardTemp = [...board]
-    if (i < 0 || i >= boardTemp.length || j < 0 || j >= boardTemp[i].length) {
-        return 0;
+function testCarre(board, i, j, objName) {
+
+    for (let squareSize = 1; squareSize < board.length + 1; squareSize++) {
+
+        for (let lgn = i; lgn < i + squareSize; lgn++) {
+            for (let cln = j; cln < j + squareSize; cln++) {
+              if (lgn == board.length || cln == board[lgn].length || board[lgn][cln] == 'x') {
+                    console.log("stop ici max = " + squareSize);
+                    allSquares[objName].max = parseInt(squareSize - 1)
+                    return
+                }
+            }
+        }
+    }
+}
+function findBiggestOne(arrQuareSize) {
+    let squarBasicArray = []
+    for (let i = 0; i >= 0; i++) {
+        if (allSquares["obstacle"+i] == undefined) {
+            break
+        } else {
+            squarBasicArray.push(allSquares["obstacle"+i])
+        }
     }
 
-    //si on tombe sur un x on arrete le traitement
+    //il faut récupérer l'élément de squarBasicArray qui a la valeur max la plus élevée pour ensuite dessiner notre réponse
+    console.log(squarBasicArray)
 
-
-    let up = testCarre(boardTemp, i - 1, j);
-    let left = testCarre(boardTemp, i, j - 1);
-    let diagonal = testCarre(boardTemp, i - 1, j - 1);
-    let squareSize = Math.min(up, left, diagonal) + 1;
-
-    if (board[i][j] == "x") {
-        
-
-    }
-
-    boardTemp[i][j] = 'o';
-
-
-
-    // allBoards.push(boardTemp)
-    return squareSize;
+    let maxLine = squarBasicArray.reduce((maxLine, item) => {
+        return item.max > maxLine.max ? item : maxLine;
+    });
+    console.log(maxLine);
+    return maxLine
 }
 
+function drawSquare(ligne, plateau) {
+    let plat = [...plateau]
+    let column = ligne.posColonne
+    let line = ligne.posLigne
+    let size = ligne.max-1 //car valeur réel et pas la valeur pour array
+    console.log(column, line, size);
+
+    for (let i = 0; i < plat.length; i++) {
+        for (let j = 0; j < plat[i].length; j++) {
+          if (i >= line && i <= line+size && j >= column && j <= column+size) {
+            if (plat[i][j] === '.') {
+              plat[i] = plat[i].substring(0, j) + 'o' + plat[i].substring(j + 1);
+            }
+          } 
+        }
+    }
+
+    console.log(plat);
+}
 
 // main f()
 function biggestCarre(file) {
@@ -162,13 +161,11 @@ function biggestCarre(file) {
     const ptnMap = indicateur[0][1]
     const obstacle = indicateur[0][2]
     const markCarre = indicateur[0][3]
-    console.log(nbLigne, ptnMap, obstacle, markCarre);
 
     //récupérer le plateau de jeu uniquement
-    // const arrPlateau = indicateur.slice(1).join("")
     const plateau = indicateur.slice(1)
-    console.log(plateau);
-    let carreMax = 0
+
+    let idxObstcl= 0
 
     //dans le tableau trouver un obstable et tester ses carrés
     for (let i = 0; i < plateau.length; i++) {
@@ -176,19 +173,20 @@ function biggestCarre(file) {
         //traiter sur chaque élément de chaque ligne
         for (let j = 0; j < plateau[i].length; j++) {
 
-            if (plateau[i][j] == "x") {
-                console.log("obstacle here");
-                //pour chaque obstacle on va calculer ses carrés adjacents et retourner le plus grand
-                let tailleCarre = testCarre(plateau,i, j)
+            //je vais remplir un tableau d'objet avec le progression max de chaque case
+            let carreCordObj = {posLigne : i, posColonne: j, max }
+            let objArrName = "obstacle"+idxObstcl
+            allSquares[objArrName] = carreCordObj
 
-                // on va comparer les tailles de carrés et retourner le plus grand
-                carreMax = Math.max(carreMax, tailleCarre)
-                
-            }
+            testCarre(plateau, i, j, objArrName)
+
+            idxObstcl++
         }
     }
-    console.log(allBoards);
 
+    let bigSquare = findBiggestOne()
+
+    drawSquare(bigSquare, plateau)
 }
 
 
