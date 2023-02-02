@@ -109,6 +109,8 @@ function testCarre(board, i, j, objName) {
         }
     }
 }
+
+
 function findBiggestOne(arrQuareSize) {
     let squarBasicArray = []
     for (let i = 0; i >= 0; i++) {

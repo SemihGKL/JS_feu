@@ -78,6 +78,12 @@ const fs = require('fs');
 const encodage = 'utf8'
 let datas
 let begin = []
+let exit = []
+const labCln = 10
+const labLgn = 10
+const labEnd = '2'
+const labStart = '1'
+let historiqueCoord = []
 
 
 
@@ -101,9 +107,56 @@ function isNotFile(args) {
     return true
 }
 
+function directionPossibilities(plat, lgn, cln) {
+  let down, top, right, left
+  let direction = []
+  down = [plat[lgn+1][cln], lgn+1, cln]
+  top = [plat[lgn-1][cln], lgn-1, cln]
+  right = [plat[lgn][cln+1], lgn, cln+1]
+  left = [plat[lgn][cln-1], lgn, cln-1]
+
+  direction.push(right, top, left, down)
+
+  //finir le jeu
+  if (down == '2' || top== '2' || right == '2' || left== '2') {
+    return 'stop'
+  }
+
+  return direction
+}
+
+function directionChoice(plat, dir) {
+
+  for (let i = 0; i < dir.length-1; i++) {
+    if (dir[i][0] == " ") {
+      let lgn = dir[i][1], cln = dir[i][2]
+      //alors on avance dans la dir en question dans l'ordre
+      console.log(dir[i]);
+      historiqueCoord.push(lgn, cln)
+      return dir[i]
+    }
+  }
+
+}
+
 
 function findPath(plat, start) {
-  
+
+  let lgnStart = start[0], clnStart = start[1]
+  let resDirection
+
+  while (resDirection !== 'stop') {
+
+    resDirection = directionPossibilities(plat, lgnStart, clnStart)
+
+    let choice = directionChoice(plat, resDirection)
+
+    lgnStart = choice[1]
+    clnStart = choice[2]
+    console.log(lgnStart,clnStart);
+  }
+
+  return
 }
 
 //mainf()
@@ -113,29 +166,26 @@ function labyr(file) {
   //get all variables we need
   const allElems = fileContent.split("\n")
 
-  const nbLgn = allElems[0][0]
-  const nbCln = allElems[0][1]
-  const obstacle = allElems[0][2]
-  const markCarre = allElems[0][3]
+  // const nbLgn = allElems[0][0]
+  // const nbCln = allElems[0][1]
+  // const labStart = allElems[0][2]
+  // const labEnd = allElems[0][3]
 
   // //récupérer le plateau de jeu uniquement
   const plateau = allElems.slice(1)
   console.log(plateau);
-
-
   //each row
   for (let i = 0; i < plateau.length; i++) {
-    
     //each element
     for (let j = 0; j < plateau[i].length; j++) {
-
-      //on a trouvé l'entrée du labyrinthe
-      if (plateau[i][j] == '2' && plateau[i][j+1] == '$') {
+      //we find the start
+      if (plateau[i][j] == labStart) {
         begin.push(i,j)
         findPath(plateau, begin)
       }
     }
   }
+
 }
 
 
