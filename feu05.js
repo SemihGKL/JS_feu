@@ -84,6 +84,7 @@ const labLgn = 10
 const labEnd = '2'
 const labStart = '1'
 let historiqueCoord = []
+let blackListCoord = []
 
 
 
@@ -125,18 +126,49 @@ function directionPossibilities(plat, lgn, cln) {
   return direction
 }
 
-function directionChoice(plat, dir) {
+function verifInBlackList(mouv) {
+  for (let i = 0; i < blackListCoord.length-1; i++) {
+    if (blackListCoord[i][0] == mouv[0] && blackListCoord[i][1] == mouv[1]) {
+      return true
+    }
+  }
+  return false
+}
 
+
+function verifInHisto(mouv) {
+  for (let i = 0; i < historiqueCoord.length-1; i++) {
+    if (historiqueCoord[i][0] == mouv[0] && historiqueCoord[i][1] == mouv[1]) {
+      return true
+    }
+  }
+  return false
+}
+
+
+function directionChoice(plat, dir) {
   for (let i = 0; i < dir.length-1; i++) {
     if (dir[i][0] == " ") {
       let lgn = dir[i][1], cln = dir[i][2]
-      //alors on avance dans la dir en question dans l'ordre
-      console.log(dir[i]);
-      historiqueCoord.push(lgn, cln)
-      return dir[i]
+      let nextMoov = [lgn, cln]
+
+      //vérifier que cette coordonnée n'est pas blackList (si apparait 2 fois dans l'historique)
+      let isBlackList = verifInBlackList(nextMoov)
+      if (isBlackList) {
+        //on doit skipper ce mouvement
+      } else {
+        let isHistoTwice = verifInHisto(nextMoov)
+        if (isHistoTwice) {
+          //ajouter dans la blackList
+          blackListCoord.push(nextMoov)
+
+        } else {
+          historiqueCoord.push(nextMoov)
+          return dir[i]
+        }
+      }
     }
   }
-
 }
 
 
@@ -144,16 +176,20 @@ function findPath(plat, start) {
 
   let lgnStart = start[0], clnStart = start[1]
   let resDirection
-
-  while (resDirection !== 'stop') {
-
+  let test = 0
+  while (test < 9) { //(resDirection !== 'stop')
     resDirection = directionPossibilities(plat, lgnStart, clnStart)
 
     let choice = directionChoice(plat, resDirection)
+    console.log(choice);
 
-    lgnStart = choice[1]
-    clnStart = choice[2]
-    console.log(lgnStart,clnStart);
+    if (choice) {
+      lgnStart = choice[1]
+      clnStart = choice[2]
+    } 
+
+    // console.log(lgnStart,clnStart);
+    test++
   }
 
   return
